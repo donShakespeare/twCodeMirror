@@ -13,13 +13,15 @@
     external_plugins: {
       twCodeMirror: "[[++assets_url]]components/tinymcewrapper/tinymceplugins/twCodeMirror.js", // plugin location
     },
+    twCodeMirrorPoppedOrInline: 1,
     toolbar: "code"
 });
 */
 
 function popMirror(target, title, width, height, okay) {
-  $("[class^=coderButton]").hide();
+  // $("[class^=coderButton]").hide();
   target = $(target);
+  targetid = target.attr("id")
   var $inline = $('<div>').hide().insertBefore(target);
   tinymce.activeEditor.windowManager.open({
     title: title ? title : "Modal Window",
@@ -33,22 +35,19 @@ function popMirror(target, title, width, height, okay) {
       type: 'container',
       onPostRender: function() {
         $(target).appendTo(".mce-popCodeMirror > .mce-container-body");
-        $(".mce-popCode .mce-close").on("click", function(e) {
-          $("[class^=coderButton]").show();
-          $inline.replaceWith(target);
-          tinymce.activeEditor.windowManager.close();
-          e.preventDefault;
-        });
+        // $(".mce-popCode .mce-close").remove()
       }
     }],
-    buttons: [{
-      text: okay ? okay : "Okay",
-      onclick: function() {
-        $("[class^=coderButton]").show();
-        $inline.replaceWith(target);
-        tinymce.activeEditor.windowManager.close();
+    buttons: [
+      {
+        text: okay ? okay : "Okay",
+        onclick: function() {
+          // $("[class^=coderButton]").show();
+          $inline.replaceWith(target);
+          tinymce.activeEditor.windowManager.close();
+        }
       }
-    }]
+    ]
   });
 
 }
@@ -68,23 +67,25 @@ function popMirror(target, title, width, height, okay) {
 // })();
 
 function killCode(target) {
-  // target.html($(".coder textarea").val()); //use without codemirrow
-  tinymce.get(target).windowManager.confirm("Done? Your content will be updated upon closing...", function(s) {
+  // target.html($(".coder textarea").val()); //use without codemirror
+  tinymce.activeEditor.windowManager.confirm("Done? Your content will be updated upon closing...", function(s) {
     if (s) {
       $("#" + target).html(window["codeT" + target].getValue());
       $(".coder." + target).remove();
       if(tinymce.get(target).getParam("inline")){
-         $("#" + target).fadeIn(); //for frontend only
-          $("#tinymceWrapperBubbleNP").removeAttr("style"); //for frontend only
+         // $("#" + target).fadeIn(); //for frontend only
+          // $("#tinymceWrapperBubbleNP").removeAttr("style"); //for frontend only
       }
-    } else {
+    }
+     else {
       return false;
     }
   })
 }
 
 function popCode(target) {
-  popMirror(".coder."+target, "CodeMirror HTML Source Code", '', '', "Close")
+  var width = $(window).width()*0.85;
+  popMirror(".coder."+target, "CodeMirror HTML Source Code", width, '', "View Inline")
 }
 tinymce.PluginManager.add('twCodeMirror', function(editor) {
   var target = $("#" + editor.id);
@@ -92,8 +93,13 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
   //editor.getContent({format : 'raw'})
   //or
   //getContent({source_view: true})
-  function initMirr() {
-    if (!$('.coder.' + editor.id).length) {
+  function initMirr(justPop) {
+    if (justPop == 1) {
+      popCode(editor.id);
+      return false;
+    }
+    // else if (!$('.coder.' + editor.id).length) {
+    else if (justPop == 0) {
       var dt = target.attr("data-tiny")
       $("#tinymceWrapperBubbleNP").css("top", "-9900px").css("left", "-9900px");
       if(editor.getParam("inline")){
@@ -102,7 +108,7 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
       else{
         var edId = editor.getContainer().id
       }
-      $("#" + edId).before("<div class='coder " + editor.id +"'><textarea class='codeT' id='codeT" + editor.id + "'>" + editor.getContent({source_view: true}) + "</textarea><button type='button' class='coderButton' title='close' onclick='killCode(\"" + editor.id + "\")'>&#10006;</button><button type='button' class='coderButtonPop' title='pop up' onclick='popCode(\"" + editor.id + "\")'>&#10132;</button>");
+      $("#" + edId).before("<div class='coder " + editor.id +"'><textarea class='codeT' id='codeT" + editor.id + "'>" + editor.getContent({source_view: true}) + "</textarea><!--<button type='button' class='coderButton'title='close' onclick='killCode(\"" + editor.id + "\")'>&#10006;</button><button type='button' class='coderButtonPop' title='pop up' onclick='popCode(\"" + editor.id + "\")'>&#10132;</button>-->");
       $('.coder.' + editor.id).fadeIn();
       window["codeT" + editor.id] = CodeMirror.fromTextArea(document.getElementById('codeT' + editor.id), {
         mode: "text/html",
@@ -119,18 +125,22 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
           "Ctrl-Space": "autocomplete"
         }
       });
-      window["codeT" + editor.id].on("mouseup keyup", function() {
+      window["codeT" + editor.id].on("keyup", function() {
         editor.setContent(window["codeT" + editor.id].getValue());
       })
       editor.on("mouseup keyup", function() {
           window["codeT" + editor.id].getDoc().setValue(editor.getContent({source_view: true}));
-        })
+      })
+      if(editor.getParam("twCodeMirrorPoppedOrInline",1) == 1){
+        popCode(editor.id)
+      }
     } else {
-      tinymce.get(editor.id).windowManager.alert("Source code is already open")
+        // killCode(editor.id)
+        popCode(editor.id)
     }
   }
 
-  function loadAll() {
+  function loadAll(style) {
     var mainCss = '<style>.codeT,.coder{position:relative}.mce-popCode *,.mce-popNPfields *{white-space:normal!important}.codeT{width:100%;resize:vertical;color:#000;min-height:300px;margin:0 auto}.coderButton,.coderButtonPop{cursor:pointer;position:absolute;border-radius:50%;color:#000;z-index:9}.coderButton{top:-20px;right:0;}.coderButtonPop{top: -20px;right: 30px;}.CodeMirror{border:1px solid #eee;min-height:300px!important;text-align:left!important}.cm-trailingspace{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==);background-position:bottom left;background-repeat:repeat-x}.mce-popCodeMirror,.mce-popCodeMirror .mce-container-body{width:inherit!important}</style>';
     if (typeof CodeMirror == 'undefined') {
       //if you want to use LAB
@@ -167,34 +177,57 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
         scriptLoaderSubs.add(basePath+'addon/edit/matchbrackets.min.js');
         scriptLoaderSubs.loadQueue(function() {
           setTimeout (function(){
-            initMirr();
+            initMirr(style);
           },500)
         })
       });
     } else {
-      initMirr();
+      initMirr(style);
     }
   }
 
   editor.addButton('code', {
-    // type:'splitbutton',
+    type: "menubutton",
+    classes: "twCoderM",
     icon: 'code',
-    tooltip: 'CodeMirror',
-    onclick: loadAll
-    // menu:[
-    //   {
-    //     text:'Exit',
-    //     onclick:function(){
-    //       killCode(editor.id)
-    //     }
-    //   },
-    //   {
-    //     text:'Pop out',
-    //     onclick:function(){
-    //       popCode(editor.id)
-    //     }
-    //   },
-    // ]
+    tooltip: 'Toggle CodeMirror',
+    onPostRender: function(){
+      $(".mce-twCoderM .mce-caret").remove();
+    },
+    onclick: function(){
+      if (!$('.mce-popCodeMirror').length && $('.coder.' + editor.id).length) {
+        $(".mce-"+editor.id+"popSource").parent().parent().css("visibility", "visible");
+        $(".mce-"+editor.id+"popSource").show();
+      }
+      else{
+        $(".mce-"+editor.id+"popSource").parent().parent().css("visibility", "hidden");
+        loadAll(0)
+      }
+      if (!$('.coder.' + editor.id).length) {
+        $(".mce-"+editor.id+"closeSource").hide();
+      }
+      else{
+        $(".mce-"+editor.id+"closeSource").show();
+      }
+    },
+    menu:[
+      {
+        text:"Pop Source",
+        classes: editor.id + "popSource",
+        onclick: function(){
+          // popCode(editor.id)
+          initMirr(1)
+        }
+      },
+      {
+        text:"Close Source",
+        classes: editor.id + "closeSource",
+        onclick: function(){
+          killCode(editor.id)
+        }
+      }
+    ]
+
   });
   editor.addMenuItem('code', {
     icon: 'code',
