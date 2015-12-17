@@ -1,5 +1,8 @@
 # twCodeMirror.js
-Awesome and beatiful source code viewer for TinyMCE
+Awesome and beautiful source code viewer for TinyMCE
+
+View your TinyMCE source code in the best Code editor, CodeMirror - pure CDN!
+Sidebyside or popped up - with live preview - no nonsense!
 
 Usage:
 ```
