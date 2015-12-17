@@ -11,7 +11,7 @@
 
   tinymce.init({
     external_plugins: {
-      twCodeMirror: "[[++assets_url]]components/tinymcewrapper/tinymceplugins/twCodeMirror.js", // plugin location
+      twCodeMirror: "[[++assets_url]]components/tinymcewrapper/tinymceplugins/twCodeMirror.js", //plugin location
     },
     twCodeMirrorPoppedOrInline: 1, //1 for popped (default), 0 for inline
     toolbar: "code",
@@ -97,7 +97,6 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
   function initMirr(justPop) {
     if (justPop == 1) {
       popCode(editor.id);
-      return false;
     }
     // else if (!$('.coder.' + editor.id).length) {
     else if (justPop == 0) {
@@ -129,15 +128,20 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
       window["codeT" + editor.id].on("keyup", function() {
         editor.setContent(window["codeT" + editor.id].getValue());
       })
-      editor.on("mouseup keyup", function() {
+      editor.on("keyup", function() {
           window["codeT" + editor.id].getDoc().setValue(editor.getContent({source_view: true}));
       })
       if(editor.getParam("twCodeMirrorPoppedOrInline",1) == 1){
         popCode(editor.id)
       }
-    } else {
-        // killCode(editor.id)
+    } 
+    else {
+      if (!$('.coder.' + editor.id).length) {
+        initMirr(0)
+      }
+      else{
         popCode(editor.id)
+      }
     }
   }
 
@@ -196,19 +200,12 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
       $(".mce-twCoderM .mce-caret").remove();
     },
     onclick: function(){
-      if (!$('.mce-popCodeMirror').length && $('.coder.' + editor.id).length) {
+      if ($('.coder.' + editor.id).length) {
         $(".mce-"+editor.id+"popSource").parent().parent().css("visibility", "visible");
-        $(".mce-"+editor.id+"popSource").show();
       }
       else{
         $(".mce-"+editor.id+"popSource").parent().parent().css("visibility", "hidden");
         loadAll(0)
-      }
-      if (!$('.coder.' + editor.id).length) {
-        $(".mce-"+editor.id+"closeSource").hide();
-      }
-      else{
-        $(".mce-"+editor.id+"closeSource").show();
       }
     },
     menu:[
@@ -216,8 +213,9 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
         text:"Pop Source",
         classes: editor.id + "popSource",
         onclick: function(){
-          // popCode(editor.id)
-          initMirr(1)
+          if ($('.coder.' + editor.id).length) {
+            loadAll()
+          }
         }
       },
       {
@@ -234,6 +232,8 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
     icon: 'code',
     text: 'CodeMirror',
     context: 'tools',
-    onclick: loadAll
+    onclick: function(){
+      loadAll()
+    }
   });
 });
