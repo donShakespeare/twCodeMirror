@@ -9,8 +9,8 @@ Usage:
 tinymce.init({
   external_plugins: {
     twCodeMirror: "[[++assets_url]]components/tinymcewrapper/tinymceplugins/twCodeMirror.js", // plugin location
-    toolbar: "code"
-  }
+  },
+  toolbar: "code"
 });
 ```
 This will replace that old pesty-looking native viewer you are used to.
