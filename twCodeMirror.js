@@ -13,8 +13,9 @@
     external_plugins: {
       twCodeMirror: "[[++assets_url]]components/tinymcewrapper/tinymceplugins/twCodeMirror.js", // plugin location
     },
-    twCodeMirrorPoppedOrInline: 1, // 1 for popped (default), 0 for inline
-    toolbar: "code"
+    twCodeMirrorPoppedOrInline: 1, //1 for popped (default), 0 for inline
+    toolbar: "code",
+    contextmenu: "code"
 });
 */
 
