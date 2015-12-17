@@ -12,7 +12,8 @@
   tinymce.init({
     external_plugins: {
       twCodeMirror: "[[++assets_url]]components/tinymcewrapper/tinymceplugins/twCodeMirror.js", // plugin location
-    }
+    },
+    toolbar: "code"
 });
 */
 
