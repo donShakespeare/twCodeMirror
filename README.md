@@ -8,9 +8,13 @@ Usage:
 ```
 tinymce.init({
   external_plugins: {
-    twCodeMirror: "[[++assets_url]]components/tinymcewrapper/tinymceplugins/twCodeMirror.js", // plugin location
+    twCodeMirror: "[[++assets_url]]components/tinymcewrapper/tinymceplugins/twCodeMirror.js", //plugin location
   },
   twCodeMirrorPoppedOrInline: 1, //1 for popped (default), 0 for inline
+  twCodeMirrorEMMETsrcURL: "", // emmet version must be for CodeMirror
+  twCodeMirrorSettings: { // pass in any COdeMirror official setting you like to overwrite default behaviour
+    ...
+   },
   toolbar: "code",
   contextmenu: "code"
 });
