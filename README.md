@@ -13,6 +13,7 @@ tinymce.init({
   twCodeMirrorPoppedOrInline: 1, //1 for popped (default), 0 for inline
   twCodeMirrorEMMETsrcURL: "", // emmet version must be for CodeMirror
   twCodeMirrorSettings: { // pass in any COdeMirror official setting you like to overwrite default behaviour
+    fontSize: 15,
     ...
    },
   toolbar: "code",
