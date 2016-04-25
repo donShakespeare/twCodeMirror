@@ -157,6 +157,14 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
       $("#" + edId).before("<div " + tarWidth + " class='coder " + editor.id + tarClass +"'><span type=button onclick='killCode(\"" + editor.id + "\")' class=mce-close-button><i class='mce-ico mce-i-remove'></i></span><textarea class='codeT' id='codeT" + editor.id + "'>" + editor.getContent({source_view: true}) + "</textarea>");
       $('.coder.' + editor.id).fadeIn();
       window["codeT" + editor.id] = CodeMirror.fromTextArea(document.getElementById('codeT' + editor.id), codeMirrorInnerInitRTE(editor.getParam("twCodeMirrorSettings",{})));
+      if(editor.getParam("twCodeMirrorSettings",{}).fontSize){
+        var fontSize = editor.getParam("twCodeMirrorSettings").fontSize;
+      }
+      else{
+        var fontSize = 15;
+      }
+      $(".coder." + editor.id + " .CodeMirror").css("font-size", fontSize)
+
       window["codeT" + editor.id].refresh();
       if(typeof emmetCodeMirror !== 'undefined'){
         emmetCodeMirror(window["codeT" + editor.id]);
@@ -204,7 +212,7 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
       tinymce.DOM.loadCSS(basePath+'addon/search/matchesonscrollbar.css');
       tinymce.DOM.loadCSS(basePath+'addon/display/fullscreen.css');
       tinymce.DOM.loadCSS(basePath+'addon/fold/foldgutter.css');
-      if(editor.getParam("twCodeMirrorSettings").theme){
+      if(editor.getParam("twCodeMirrorSettings",{}).theme){
         tinymce.DOM.loadCSS(basePath+'theme/'+editor.getParam("twCodeMirrorSettings").theme+'.css');
       }
       scriptLoaderMain.add(basePath+'codemirror.min.js');
@@ -276,6 +284,13 @@ tinymce.PluginManager.add('twCodeMirror', function(editor) {
           }
         }
       }
+      // ,{
+      //   text:"Close Source",
+      //   classes: editor.id + "closeSource",
+      //   onclick: function(){
+      //     killCodeCodeMirror(editor.id)
+      //   }
+      // }
     ]
 
   });
